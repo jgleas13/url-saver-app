@@ -1,0 +1,52 @@
+---
+description: Apply these rules when making changes to the project
+globs:
+alwaysApply: true
+---
+
+Update this rule if user requested changes to the project requirement, etc.
+# Tech Stack Document
+
+## Introduction
+
+This project aims to streamline the process of capturing web content via an iPhone, saving and organizing the information for future reference through a user-friendly website. Users will share a URL from their iPhone using a shortcut, after which the app will summarize the content, store pertinent details, and present this information in an organized manner. This project's technology choices focus on providing simplicity, speed, and an intuitive user experience, allowing users with varying levels of technical knowledge to leverage a straightforward and efficient tool.
+
+## Frontend and Backend Technologies Combined
+
+For this project, our chosen technology allows us to merge the frontend and backend, simplifying deployment and management without needing separate setups:
+
+*   **Next.js**: This framework is versatile, allowing us to build both the frontend and backend in a unified manner, ensuring that our app is built quickly and efficiently. This was chosen because it supports server-side rendering, which enhances SEO performance and speeds up page loads, contributing to a smooth user experience.
+*   **Supabase**: As a backend-as-a-service, it provides an enjoyable developer experience with features like database storage, user authentication, and integrated APIs. This choice aligns with our requirement for a straightforward authentication process using Google sign-in and a robust data management system.
+
+With these technologies, we achieve a cohesive development environment that minimizes complexity while maintaining functional clarity.
+
+## Infrastructure and Deployment
+
+We opted for a streamlined infrastructure that supports the combination of frontend and backend:
+
+*   **Vercel**: By deploying our full-stack Next.js application on Vercel, we take advantage of its robust hosting capabilities that ensure efficient deployments and easy scalability. Vercel provides automatic scaling and delivers optimal performance globally, enhancing the user experience by keeping pages fast and reliable.
+
+This choice makes it simpler to manage and maintain the app as it grows, ensuring that updates are seamlessly propagated without downtime.
+
+## Third-Party Integrations
+
+Our project benefits from specific integrations that enhance its overall functionality and user experience:
+
+*   **Grok AI**: This integration is central to generating concise summaries from shared URLs, providing users with a quick and informative overview of content.
+*   **Supabase Authentication**: By integrating with Supabase, we enable users to sign in using their Google accounts, providing a secure and hassle-free authentication process.
+*   **iOS Shortcut**: This tool facilitates the URL sharing process by allowing users to save interesting links directly from their iPhone, aligning with our focus on simplicity and user efficiency.
+
+These integrations collectively enrich the app's functionality by keeping processes user-friendly and secure.
+
+## Security and Performance Considerations
+
+Security and performance are core components of this project’s architecture:
+
+*   **Security**: By using Supabase Authentication, we leverage OAuth-based Google sign-in, ensuring secure access management. All data transmission is encrypted using HTTPS for additional security.
+*   **Performance**: The choice of Next.js ensures fast content delivery through server-side rendering. Asynchronous processing in our summarization tool guarantees responsive interaction with minimal delay.
+
+These considerations collectively provide users with a secure, reliable, and efficient experience.
+
+## Conclusion and Overall Tech Stack Summary
+
+This project leverages a combined approach using Next.js for both frontend and backend development, deploying on Vercel for seamless performance. Our choices highlight the importance of ease in managing shared web content through Grok’s summarization features, while Supabase facilitates secure user authentication. These technologies and integrations work in harmony to offer a seamless experience from capturing URLs, processing them to display summaries, and providing an intuitive interface for users to interact with their saved content. This thoughtful tech stack not only meets the project goals efficiently but also lays the foundation for a robust tool that prioritizes simplicity and user satisfaction.
