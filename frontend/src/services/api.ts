@@ -6,10 +6,11 @@ export interface UrlData {
   id: string;
   url: string;
   pageTitle: string;
+  aiGeneratedTitle?: string;
   dateAccessed: string;
   summary: string | null;
   tags: string[];
-  processingStatus: 'completed' | 'failed';
+  processingStatus: 'completed' | 'failed' | 'pending' | 'processing';
   created_at: string;
   updated_at: string;
 }
@@ -38,6 +39,7 @@ export const fetchUrls = async (): Promise<UrlData[]> => {
         id: doc.id,
         url: data.url,
         pageTitle: data.pageTitle || 'Untitled',
+        aiGeneratedTitle: data.aiGeneratedTitle || undefined,
         dateAccessed: data.dateAccessed || new Date().toISOString(),
         summary: data.summary || null,
         tags: data.tags || ['untagged'],
@@ -76,8 +78,8 @@ export const saveUrl = async (urlData: {
       pageTitle: urlData.pageTitle || 'Untitled',
       dateAccessed: urlData.dateAccessed || new Date().toISOString(),
       summary: 'Generated summary will appear here once processed.', // Placeholder
-      tags: ['manual'],
-      processingStatus: 'completed' as const,
+      tags: ['pending'],
+      processingStatus: 'pending' as const,
       created_at: serverTimestamp(),
       updated_at: serverTimestamp()
     };
@@ -92,7 +94,7 @@ export const saveUrl = async (urlData: {
       dateAccessed: newUrl.dateAccessed,
       summary: newUrl.summary,
       tags: newUrl.tags,
-      processingStatus: newUrl.processingStatus,
+      processingStatus: 'pending' as const,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };

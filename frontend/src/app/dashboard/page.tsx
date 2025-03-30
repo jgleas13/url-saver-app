@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { fetchUrls, UrlData } from '@/services/api';
 import { auth } from '@/config/firebaseClient';
-import LinkCard from '@/components/LinkCard/LinkCard';
 import FilterSortBar from '@/components/FilterSortBar/FilterSortBar';
 import AddUrlModal from '@/components/AddUrlModal/AddUrlModal';
+import Navbar from '@/components/Navbar/Navbar';
+import LinkTable from '@/components/LinkTable/LinkTable';
+import AddUrlButton from '@/components/AddUrlButton/AddUrlButton';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -25,7 +27,7 @@ export default function DashboardPage() {
       setFilteredUrls(urlsData);
     } catch (err) {
       console.error('Error fetching URLs:', err);
-      setError('Failed to load your saved URLs. Please try refreshing the page.');
+      setError('Failed to load your saved links. Please try refreshing the page.');
     } finally {
       setLoading(false);
     }
@@ -50,24 +52,13 @@ export default function DashboardPage() {
         return () => unsubscribe();
       } catch (err) {
         console.error('Error in dashboard initialization:', err);
-        setError('Failed to load your saved URLs. Please try refreshing the page.');
+        setError('Failed to load your saved links. Please try refreshing the page.');
         setLoading(false);
       }
     };
     
     checkAuthAndFetchUrls();
   }, [router]);
-  
-  // Handle sign out
-  const handleSignOut = async () => {
-    try {
-      await auth.signOut();
-      router.push('/');
-    } catch (err) {
-      console.error('Error signing out:', err);
-      alert('Failed to sign out. Please try again.');
-    }
-  };
 
   // Handle opening modal
   const openAddModal = () => {
@@ -81,30 +72,17 @@ export default function DashboardPage() {
   
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Your Saved URLs</h1>
-          
-          <div className="flex items-center space-x-4">
-            <a 
-              href="/activity" 
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Activity
-            </a>
-            <button
-              onClick={handleSignOut}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
       
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="md:flex md:items-center md:justify-between mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Saved Links</h1>
+          <div className="mt-4 md:mt-0">
+            <AddUrlButton onClick={openAddModal} />
+          </div>
+        </div>
+
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -115,45 +93,23 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* Top action bar with filter and add button */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 space-y-4 md:space-y-0">
+            {/* Filter and search section */}
+            <div className="mb-6">
               <FilterSortBar urls={urls} onFilterChange={setFilteredUrls} />
-              
-              <button
-                onClick={openAddModal}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add URL Manually
-              </button>
             </div>
             
-            {/* URL List */}
+            {/* URL Table */}
             {filteredUrls.length > 0 ? (
-              <div className="space-y-4">
-                {filteredUrls.map((url) => (
-                  <LinkCard key={url.id} urlData={url} />
-                ))}
-              </div>
+              <LinkTable urls={filteredUrls} />
             ) : (
-              <div className="text-center py-12">
+              <div className="text-center py-12 bg-white rounded-lg shadow">
                 <p className="text-gray-500 text-lg mb-4">
                   {urls.length > 0 
-                    ? 'No URLs match your current filters'
-                    : 'No saved URLs yet. Add your first URL!'}
+                    ? 'No links match your current filters'
+                    : 'No saved links yet. Add your first link!'}
                 </p>
                 {urls.length === 0 && (
-                  <button
-                    onClick={openAddModal}
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-200"
-                  >
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Add URL Manually
-                  </button>
+                  <AddUrlButton onClick={openAddModal} />
                 )}
               </div>
             )}
