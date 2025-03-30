@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const functions = require('firebase-functions');
 const dotenv = require('dotenv');
 const admin = require('firebase-admin');
 
@@ -14,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: true }));  // Allow requests from any origin
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -46,12 +47,26 @@ const authenticateUser = async (req, res, next) => {
 // Routes
 app.use('/api/v1/urls', authenticateUser, urlsRoutes);
 
-// Basic route for testing
-app.get('/', (req, res) => {
-  res.json({ message: 'API is running' });
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API is running' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-}); 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
+
+// Export the API as a Firebase Cloud Function
+exports.api = functions.https.onRequest(app);
+
+// If running locally without Firebase
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+} 
