@@ -10,7 +10,7 @@ interface LinkTableProps {
 
 export default function LinkTable({ urls, onDelete }: LinkTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-
+  
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -33,8 +33,13 @@ export default function LinkTable({ urls, onDelete }: LinkTableProps) {
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation(); // Prevent row expansion
+    console.log('Delete button clicked for URL ID:', id);
+    
     if (confirm('Are you sure you want to delete this URL?')) {
+      console.log('Deletion confirmed for URL ID:', id);
       onDelete(id);
+    } else {
+      console.log('Deletion canceled by user');
     }
   };
 
@@ -55,9 +60,7 @@ export default function LinkTable({ urls, onDelete }: LinkTableProps) {
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Status
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
+            <th scope="col" className="w-10"></th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -122,12 +125,15 @@ export default function LinkTable({ urls, onDelete }: LinkTableProps) {
                           : 'Failed'}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-6 py-4 whitespace-nowrap text-right">
                   <button
-                    className="text-white bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-xs"
+                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded p-1 transition-colors"
                     onClick={(e) => handleDelete(e, url.id)}
+                    title="Delete"
                   >
-                    Delete
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
                   </button>
                 </td>
               </tr>

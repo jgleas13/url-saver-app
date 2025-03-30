@@ -1,109 +1,96 @@
-# URL Saver App
+# URL Saver App with Grok AI Summarization
 
-A web application that allows you to save URLs from your iPhone and view them later on a website. The app generates AI summaries of the content and organizes links by tags and dates.
+A modern web application to save, organize, and automatically summarize URLs using Grok AI.
 
 ## Features
 
-- Save URLs directly from your iPhone using iOS Shortcuts
-- Automatic AI summarization of webpage content using Grok
-- Modern dashboard to view all saved URLs
-- Filter and sort URLs by tags, date, and content type
-- Google authentication via Firebase
+- Save and organize URLs from around the web
+- Automatic AI-powered summarization of web content using Grok AI
+- Tag generation for easy content categorization
+- User authentication and personalized URL collections
+- Responsive design that works on desktop and mobile
 
-## Tech Stack
+## Project Structure
 
-- **Frontend**: Next.js, Tailwind CSS
-- **Backend**: Firebase (Authentication, Firestore, Hosting)
-- **AI Summarization**: Grok API
-- **Deployment**: Vercel, GitHub Actions
+This project consists of two main parts:
 
-## Development Setup
+- **Frontend**: A Next.js application with Firebase Authentication and Firestore
+- **Firebase Cloud Functions**: For processing saved URLs and generating summaries with Grok AI
+
+## Setup
 
 ### Prerequisites
 
-- Node.js (v20 or later)
-- npm
-- Firebase CLI (`npm install -g firebase-tools`)
-- A Firebase project with Firestore and Authentication enabled
+- Node.js 18+
+- Firebase account with Blaze plan (for Cloud Functions with external API calls)
+- Grok AI API key
 
-### Installation
+### Frontend Setup
 
-1. Clone the repository
-   ```bash
-   git clone https://github.com/jgleas13/url-saver-app.git
-   cd url-saver-app
+1. Navigate to the frontend directory:
+   ```
+   cd frontend
    ```
 
-2. Install dependencies
-   ```bash
-   cd frontend
+2. Install dependencies:
+   ```
    npm install
    ```
 
-3. Set up environment variables
-   Create a `.env.local` file in the frontend directory with the following variables:
+3. Create a `.env.local` file with your Firebase configuration:
    ```
-   NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-firebase-auth-domain
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-firebase-project-id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-firebase-storage-bucket
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-firebase-messaging-sender-id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id
+   NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
    ```
 
-4. Run the development server
-   ```bash
+4. Run the development server:
+   ```
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application
+### Cloud Functions Setup
 
-## Deployment
-
-### Manual Deployment
-
-1. Build the application
-   ```bash
-   cd frontend
-   npm run build
+1. Navigate to the backend/functions directory:
+   ```
+   cd backend/functions
    ```
 
-2. Deploy to Firebase
-   ```bash
-   firebase use url-saver-app-123
-   firebase deploy --only hosting
+2. Install dependencies:
+   ```
+   npm install
    ```
 
-### Automated Deployment with GitHub Actions
-
-The repository is configured with GitHub Actions to automatically deploy to Firebase Hosting when changes are pushed to the main branch.
-
-To set up automated deployment:
-
-1. Generate a Firebase Service Account key from the Firebase Console
-   - Go to Project Settings > Service Accounts
-   - Click "Generate new private key"
-   - Save the key securely
-
-2. Add the service account key as a GitHub repository secret
-   - Go to your GitHub repository > Settings > Secrets and variables > Actions
-   - Add a new repository secret named `FIREBASE_SERVICE_ACCOUNT_URL_SAVER_APP_123`
-   - Paste the entire content of the service account JSON file
-
-3. Push changes to the main branch to trigger deployment
-   ```bash
-   git push origin main
+3. Create a `.env` file with your Grok AI API key:
+   ```
+   GROK_API_KEY=your-grok-api-key
    ```
 
-## iOS Shortcut Setup
+4. Deploy the functions to Firebase:
+   ```
+   npm run deploy
+   ```
 
-1. Create a new iOS Shortcut on your iPhone
-2. Add a "Get Current URL" action
-3. Add a "Get Contents of URL" action with:
-   - Method: POST
-   - URL: your-firebase-function-url
-   - Headers: Content-Type: application/json
-   - Request Body: JSON with the URL, title, and current date
+## How It Works
+
+1. Users save URLs through the web interface
+2. A Firestore trigger automatically processes new URLs
+3. The Cloud Function fetches the URL content
+4. Grok AI generates a summary and relevant tags
+5. The summary and tags are saved back to Firestore
+6. Real-time updates reflect the summarization status in the UI
+
+## Firebase Requirements
+
+This project requires the Firebase Blaze (pay-as-you-go) plan because:
+
+1. Cloud Functions need to make external API calls (to fetch URLs and call the Grok API)
+2. The free Spark plan does not allow outbound network requests from Cloud Functions
+
+The actual usage costs should be minimal for personal use.
 
 ## License
 

@@ -27,14 +27,23 @@ export const fetchUrls = async (): Promise<UrlData[]> => {
     }
 
     const userId = currentUser.uid;
+    console.log('Fetching URLs for user ID:', userId);
+    
+    const urlsPath = `users/${userId}/urls`;
+    console.log('Collection path:', urlsPath);
+    
     const urlsQuery = query(
       collection(db, 'users', userId, 'urls'),
       orderBy('created_at', 'desc')
     );
 
     const querySnapshot = await getDocs(urlsQuery);
+    console.log(`Found ${querySnapshot.docs.length} URLs in collection`);
+    
     const urlsData: UrlData[] = querySnapshot.docs.map(doc => {
       const data = doc.data();
+      console.log('URL document ID:', doc.id);
+      
       return {
         id: doc.id,
         url: data.url,
@@ -111,15 +120,22 @@ export const saveUrl = async (urlData: {
  */
 export const deleteUrl = async (urlId: string): Promise<void> => {
   try {
+    console.log('Attempting to delete URL with ID:', urlId);
+    
     const currentUser = auth.currentUser;
     if (!currentUser) {
+      console.error('Delete failed: User not authenticated');
       throw new Error('User not authenticated');
     }
 
     const userId = currentUser.uid;
+    console.log('Current user ID:', userId);
+    
     const urlDocRef = doc(db, 'users', userId, 'urls', urlId);
+    console.log('Document path:', `users/${userId}/urls/${urlId}`);
     
     await deleteDoc(urlDocRef);
+    console.log('URL successfully deleted');
   } catch (error) {
     console.error('Error deleting URL:', error);
     throw error;

@@ -75,13 +75,21 @@ export default function DashboardPage() {
   const handleUrlDelete = async (urlId: string) => {
     try {
       setIsDeleting(true);
+      console.log('Starting delete operation for URL ID:', urlId);
       await deleteUrl(urlId);
+      console.log('Delete operation completed successfully');
+      
       // Update the UI after successful deletion
       setUrls(urls.filter(url => url.id !== urlId));
       setFilteredUrls(filteredUrls.filter(url => url.id !== urlId));
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('Error deleting URL:', err);
-      alert('Failed to delete URL. Please try again.');
+      // Show a more detailed error message
+      let errorMessage = 'Unknown error';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      alert(`Failed to delete URL: ${errorMessage}. Please try again.`);
     } finally {
       setIsDeleting(false);
     }
