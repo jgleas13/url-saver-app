@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchUrls, UrlData, saveUrl } from '@/services/api';
+import { fetchUrls, UrlData } from '@/services/api';
 import { auth } from '@/config/firebaseClient';
 import LinkCard from '@/components/LinkCard/LinkCard';
 import FilterSortBar from '@/components/FilterSortBar/FilterSortBar';

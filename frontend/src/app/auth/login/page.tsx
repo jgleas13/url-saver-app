@@ -29,6 +29,15 @@ export default function LoginPage() {
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
+      // Add scopes if needed
+      provider.addScope('https://www.googleapis.com/auth/userinfo.email');
+      provider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+      
+      // Set custom parameters
+      provider.setCustomParameters({
+        prompt: 'select_account',
+      });
+      
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
     } catch (error) {

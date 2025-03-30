@@ -26,7 +26,8 @@ export default function AddUrlModal({ isOpen, onClose, onUrlAdded }: AddUrlModal
     try {
       const url = new URL(urlString);
       return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (_) {
       return false;
     }
   };
@@ -108,7 +109,7 @@ export default function AddUrlModal({ isOpen, onClose, onUrlAdded }: AddUrlModal
                 disabled={isSubmitting}
               />
               <p className="mt-1 text-xs text-gray-500">
-                If left blank, we'll try to extract the title from the webpage automatically.
+                If left blank, we&apos;ll try to extract the title from the webpage automatically.
               </p>
             </div>
             

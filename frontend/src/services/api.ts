@@ -1,4 +1,5 @@
-import { auth } from '@/config/firebaseClient';
+import { auth, db } from '@/config/firebaseClient';
+import { collection, query, getDocs, addDoc, orderBy, serverTimestamp } from 'firebase/firestore';
 
 // Types
 export interface UrlData {
@@ -13,36 +14,40 @@ export interface UrlData {
   updated_at: string;
 }
 
-// Base API URL
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
-
 /**
- * Fetch all saved URLs from the API
+ * Fetch all saved URLs from Firestore
  * @returns Promise<UrlData[]>
  */
 export const fetchUrls = async (): Promise<UrlData[]> => {
-  // Get the current user's token for authentication
-  const currentUser = auth.currentUser;
-  const token = currentUser ? await currentUser.getIdToken() : null;
-  
   try {
-    const response = await fetch(`${API_URL}/urls`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        // Add authorization header if we have a token
-        ...(token && {
-          'Authorization': `Bearer ${token}`
-        })
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('User not authenticated');
     }
 
-    const data = await response.json();
-    return data;
+    const userId = currentUser.uid;
+    const urlsQuery = query(
+      collection(db, 'users', userId, 'urls'),
+      orderBy('created_at', 'desc')
+    );
+
+    const querySnapshot = await getDocs(urlsQuery);
+    const urlsData: UrlData[] = querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        url: data.url,
+        pageTitle: data.pageTitle || 'Untitled',
+        dateAccessed: data.dateAccessed || new Date().toISOString(),
+        summary: data.summary || null,
+        tags: data.tags || ['untagged'],
+        processingStatus: data.processingStatus || 'completed',
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString()
+      } as UrlData;
+    });
+
+    return urlsData;
   } catch (error) {
     console.error('Error fetching URLs:', error);
     throw error;
@@ -50,7 +55,7 @@ export const fetchUrls = async (): Promise<UrlData[]> => {
 };
 
 /**
- * Save a URL to the API
+ * Save a URL to Firestore
  * @param urlData URL data to save
  * @returns Promise<UrlData>
  */
@@ -59,29 +64,38 @@ export const saveUrl = async (urlData: {
   pageTitle?: string;
   dateAccessed?: string;
 }): Promise<UrlData> => {
-  // Get the current user's token for authentication
-  const currentUser = auth.currentUser;
-  const token = currentUser ? await currentUser.getIdToken() : null;
-
   try {
-    const response = await fetch(`${API_URL}/urls`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Add authorization header if we have a token
-        ...(token && {
-          'Authorization': `Bearer ${token}`
-        })
-      },
-      body: JSON.stringify(urlData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API error: ${response.status}`);
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('User not authenticated');
     }
 
-    const data = await response.json();
-    return data;
+    const userId = currentUser.uid;
+    const newUrl = {
+      url: urlData.url,
+      pageTitle: urlData.pageTitle || 'Untitled',
+      dateAccessed: urlData.dateAccessed || new Date().toISOString(),
+      summary: 'Generated summary will appear here once processed.', // Placeholder
+      tags: ['manual'],
+      processingStatus: 'completed' as const,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp()
+    };
+
+    const docRef = await addDoc(collection(db, 'users', userId, 'urls'), newUrl);
+    
+    // Return the saved URL data with the new ID
+    return {
+      id: docRef.id,
+      url: newUrl.url,
+      pageTitle: newUrl.pageTitle,
+      dateAccessed: newUrl.dateAccessed,
+      summary: newUrl.summary,
+      tags: newUrl.tags,
+      processingStatus: newUrl.processingStatus,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
   } catch (error) {
     console.error('Error saving URL:', error);
     throw error;
