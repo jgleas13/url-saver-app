@@ -1,74 +1,48 @@
-// API base URL - This should come from environment variable in production
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+import { auth } from '@/config/firebaseClient';
 
 // Types
-export interface UrlSubmission {
-  url: string;
-  title?: string;
-  dateAccessed?: string;
-  userId: string;
-}
-
-export interface UrlEntry {
+export interface UrlData {
   id: string;
   url: string;
-  title: string;
+  pageTitle: string;
   dateAccessed: string;
   summary: string | null;
-  processingStatus: 'pending' | 'completed' | 'failed';
   tags: string[];
-  userId: string;
-  createdAt?: string;
-  updatedAt?: string;
+  processingStatus: 'completed' | 'failed';
+  created_at: string;
+  updated_at: string;
 }
 
-// API Functions
+// Base API URL
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 /**
- * Submit a URL to be processed and stored
+ * Fetch all saved URLs from the API
+ * @returns Promise<UrlData[]>
  */
-export const submitUrl = async (urlData: UrlSubmission): Promise<UrlEntry> => {
+export const fetchUrls = async (): Promise<UrlData[]> => {
+  // Get the current user's token for authentication
+  const currentUser = auth.currentUser;
+  const token = currentUser ? await currentUser.getIdToken() : null;
+  
   try {
-    const response = await fetch(`${API_BASE_URL}/urls`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(urlData),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || 'Failed to submit URL');
-    }
-
-    return result.data;
-  } catch (error) {
-    console.error('Error submitting URL:', error);
-    throw error;
-  }
-};
-
-/**
- * Get all URLs for a specific user
- */
-export const getUrlsByUser = async (userId: string): Promise<UrlEntry[]> => {
-  try {
-    const response = await fetch(`${API_BASE_URL}/urls?userId=${userId}`, {
+    const response = await fetch(`${API_URL}/urls`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      },
+        // Add authorization header if we have a token
+        ...(token && {
+          'Authorization': `Bearer ${token}`
+        })
+      }
     });
 
-    const result = await response.json();
-
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to fetch URLs');
+      throw new Error(`API error: ${response.status}`);
     }
 
-    return result.data;
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error('Error fetching URLs:', error);
     throw error;
@@ -76,26 +50,40 @@ export const getUrlsByUser = async (userId: string): Promise<UrlEntry[]> => {
 };
 
 /**
- * Get a specific URL by ID
+ * Save a URL to the API
+ * @param urlData URL data to save
+ * @returns Promise<UrlData>
  */
-export const getUrlById = async (id: string): Promise<UrlEntry> => {
+export const saveUrl = async (urlData: {
+  url: string;
+  pageTitle?: string;
+  dateAccessed?: string;
+}): Promise<UrlData> => {
+  // Get the current user's token for authentication
+  const currentUser = auth.currentUser;
+  const token = currentUser ? await currentUser.getIdToken() : null;
+
   try {
-    const response = await fetch(`${API_BASE_URL}/urls/${id}`, {
-      method: 'GET',
+    const response = await fetch(`${API_URL}/urls`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        // Add authorization header if we have a token
+        ...(token && {
+          'Authorization': `Bearer ${token}`
+        })
       },
+      body: JSON.stringify(urlData),
     });
 
-    const result = await response.json();
-
     if (!response.ok) {
-      throw new Error(result.message || 'Failed to fetch URL');
+      throw new Error(`API error: ${response.status}`);
     }
 
-    return result.data;
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('Error fetching URL details:', error);
+    console.error('Error saving URL:', error);
     throw error;
   }
 }; 
