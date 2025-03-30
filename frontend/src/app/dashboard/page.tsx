@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { fetchUrls, UrlData } from '@/services/api';
+import { fetchUrls, deleteUrl, UrlData } from '@/services/api';
 import { auth } from '@/config/firebaseClient';
 import FilterSortBar from '@/components/FilterSortBar/FilterSortBar';
 import AddUrlModal from '@/components/AddUrlModal/AddUrlModal';
@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Function to fetch URLs
   const fetchUserUrls = async () => {
@@ -70,6 +71,22 @@ export default function DashboardPage() {
     fetchUserUrls();
   };
   
+  // Handle URL deletion
+  const handleUrlDelete = async (urlId: string) => {
+    try {
+      setIsDeleting(true);
+      await deleteUrl(urlId);
+      // Update the UI after successful deletion
+      setUrls(urls.filter(url => url.id !== urlId));
+      setFilteredUrls(filteredUrls.filter(url => url.id !== urlId));
+    } catch (err) {
+      console.error('Error deleting URL:', err);
+      alert('Failed to delete URL. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -77,7 +94,7 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="md:flex md:items-center md:justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Saved Links</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
           <div className="mt-4 md:mt-0">
             <AddUrlButton onClick={openAddModal} />
           </div>
@@ -100,7 +117,17 @@ export default function DashboardPage() {
             
             {/* URL Table */}
             {filteredUrls.length > 0 ? (
-              <LinkTable urls={filteredUrls} />
+              <div className="relative">
+                {isDeleting && (
+                  <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-10">
+                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                  </div>
+                )}
+                <LinkTable 
+                  urls={filteredUrls} 
+                  onDelete={handleUrlDelete} 
+                />
+              </div>
             ) : (
               <div className="text-center py-12 bg-white rounded-lg shadow">
                 <p className="text-gray-500 text-lg mb-4">

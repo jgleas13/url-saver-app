@@ -1,14 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { UrlData } from '@/services/api';
 
 interface LinkTableProps {
   urls: UrlData[];
+  onDelete: (urlId: string) => void;
 }
 
-export default function LinkTable({ urls }: LinkTableProps) {
+export default function LinkTable({ urls, onDelete }: LinkTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(null);
+      }
+    }
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -30,6 +47,19 @@ export default function LinkTable({ urls }: LinkTableProps) {
     }
   };
 
+  const toggleDropdown = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Prevent row expansion
+    setDropdownOpen(dropdownOpen === id ? null : id);
+  };
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // Prevent row expansion
+    if (confirm('Are you sure you want to delete this URL?')) {
+      onDelete(id);
+      setDropdownOpen(null);
+    }
+  };
+
   return (
     <div className="bg-white shadow overflow-hidden rounded-lg">
       <table className="min-w-full divide-y divide-gray-200">
@@ -46,6 +76,9 @@ export default function LinkTable({ urls }: LinkTableProps) {
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Status
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
             </th>
           </tr>
         </thead>
@@ -111,10 +144,35 @@ export default function LinkTable({ urls }: LinkTableProps) {
                           : 'Failed'}
                   </span>
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap relative">
+                  <div className="flex items-center justify-end" ref={dropdownRef}>
+                    <button 
+                      className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                      onClick={(e) => toggleDropdown(e, url.id)}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      </svg>
+                    </button>
+                    
+                    {dropdownOpen === url.id && (
+                      <div className="absolute right-0 top-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                        <div className="py-1">
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            onClick={(e) => handleDelete(e, url.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </td>
               </tr>
               {expandedRow === url.id && (
                 <tr className="bg-gray-50">
-                  <td colSpan={4} className="px-6 py-4">
+                  <td colSpan={5} className="px-6 py-4">
                     <div className="text-sm text-gray-700 space-y-3">
                       <div className="text-sm text-gray-500">
                         {url.url}

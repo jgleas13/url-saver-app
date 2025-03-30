@@ -1,5 +1,5 @@
 import { auth, db } from '@/config/firebaseClient';
-import { collection, query, getDocs, addDoc, orderBy, serverTimestamp } from 'firebase/firestore';
+import { collection, query, getDocs, addDoc, orderBy, serverTimestamp, doc, deleteDoc } from 'firebase/firestore';
 
 // Types
 export interface UrlData {
@@ -100,6 +100,28 @@ export const saveUrl = async (urlData: {
     };
   } catch (error) {
     console.error('Error saving URL:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a URL from Firestore by ID
+ * @param urlId The ID of the URL to delete
+ * @returns Promise<void>
+ */
+export const deleteUrl = async (urlId: string): Promise<void> => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    const userId = currentUser.uid;
+    const urlDocRef = doc(db, 'users', userId, 'urls', urlId);
+    
+    await deleteDoc(urlDocRef);
+  } catch (error) {
+    console.error('Error deleting URL:', error);
     throw error;
   }
 }; 
