@@ -1,122 +1,110 @@
-# iPhone URL Sharing & AI Summarization App
+# URL Saver App
 
-A modern web application that allows users to save and organize URLs shared from their iPhones. The app automatically summarizes webpage content using Grok AI, adds tags, and provides an organized dashboard for easy retrieval.
+A web application that allows you to save URLs from your iPhone and view them later on a website. The app generates AI summaries of the content and organizes links by tags and dates.
 
 ## Features
 
-- Share URLs directly from your iPhone using iOS Shortcuts
-- Automatic AI-powered summarization of webpage content
-- Tag-based organization for easy filtering
-- Modern, clean dashboard interface
+- Save URLs directly from your iPhone using iOS Shortcuts
+- Automatic AI summarization of webpage content using Grok
+- Modern dashboard to view all saved URLs
+- Filter and sort URLs by tags, date, and content type
 - Google authentication via Firebase
-- Activity tracking for all processed URLs
 
-## Project Structure
+## Tech Stack
 
-This project consists of two main parts:
+- **Frontend**: Next.js, Tailwind CSS
+- **Backend**: Firebase (Authentication, Firestore, Hosting)
+- **AI Summarization**: Grok API
+- **Deployment**: Vercel, GitHub Actions
 
-1. **Frontend**: A Next.js 14 web application with TypeScript and Tailwind CSS
-2. **Backend**: A Node.js Express API that processes URLs and interacts with Firebase
-
-## Setup Instructions
+## Development Setup
 
 ### Prerequisites
 
-- Node.js LTS version (20.x or later)
-- Firebase account for authentication and database
-- Grok AI API access (for production use)
+- Node.js (v20 or later)
+- npm
+- Firebase CLI (`npm install -g firebase-tools`)
+- A Firebase project with Firestore and Authentication enabled
 
-### Environment Setup
+### Installation
 
-1. Clone the repository and install dependencies:
+1. Clone the repository
+   ```bash
+   git clone https://github.com/jgleas13/url-saver-app.git
+   cd url-saver-app
+   ```
 
-```bash
-# Install backend dependencies
-cd backend
-npm install
+2. Install dependencies
+   ```bash
+   cd frontend
+   npm install
+   ```
 
-# Install frontend dependencies
-cd ../frontend
-npm install
-```
+3. Set up environment variables
+   Create a `.env.local` file in the frontend directory with the following variables:
+   ```
+   NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-firebase-auth-domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-firebase-project-id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-firebase-storage-bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-firebase-messaging-sender-id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your-firebase-app-id
+   ```
 
-2. Configure environment variables:
+4. Run the development server
+   ```bash
+   npm run dev
+   ```
 
-For the backend, create a `.env` file in the `backend` directory:
-
-```
-PORT=3001
-FIREBASE_SERVICE_ACCOUNT={"type":"service_account",...} # Your service account key JSON as a string
-FIREBASE_DATABASE_URL=https://your-project-id.firebaseio.com
-GROK_API_KEY=your-grok-api-key
-```
-
-For the frontend, create a `.env.local` file in the `frontend` directory:
-
-```
-NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
-NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
-NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
-```
-
-### Firebase Setup
-
-1. Create a new Firebase project in the [Firebase Console](https://console.firebase.google.com/)
-2. Enable Google Authentication in the Authentication section
-3. Set up Firestore Database and create a collection named `urls`
-4. Generate a service account key from Project Settings > Service Accounts
-5. Configure security rules for Firestore to restrict access to authenticated users
-
-### Running the Application
-
-1. Start the backend server:
-
-```bash
-cd backend
-npm run dev
-```
-
-2. Start the frontend development server:
-
-```bash
-cd frontend
-npm run dev
-```
-
-3. Visit `http://localhost:3000` in your browser to access the application
-
-## iOS Shortcut Setup
-
-1. Create a new iOS Shortcut in the Shortcuts app
-2. Add an action to get the current webpage URL
-3. Add an HTTP Request action with the following configuration:
-   - Method: POST
-   - URL: Your backend API URL (e.g., https://your-deployed-app.com/api/v1/urls)
-   - Headers: Content-Type: application/json
-   - Request Body (JSON):
-     ```json
-     {
-       "url": "{{URL}}",
-       "pageTitle": "{{Page Title}}",
-       "dateAccessed": "{{Current Date}}"
-     }
-     ```
-4. Add a notification to show a success message
-5. Save and share the shortcut to your home screen
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application
 
 ## Deployment
 
-The application can be deployed using Vercel for both the frontend and backend:
+### Manual Deployment
 
-1. Push your code to a Git repository
-2. Connect your repository to Vercel
-3. Configure environment variables in the Vercel dashboard
-4. Deploy both the backend and frontend
+1. Build the application
+   ```bash
+   cd frontend
+   npm run build
+   ```
+
+2. Deploy to Firebase
+   ```bash
+   firebase use url-saver-app-123
+   firebase deploy --only hosting
+   ```
+
+### Automated Deployment with GitHub Actions
+
+The repository is configured with GitHub Actions to automatically deploy to Firebase Hosting when changes are pushed to the main branch.
+
+To set up automated deployment:
+
+1. Generate a Firebase Service Account key from the Firebase Console
+   - Go to Project Settings > Service Accounts
+   - Click "Generate new private key"
+   - Save the key securely
+
+2. Add the service account key as a GitHub repository secret
+   - Go to your GitHub repository > Settings > Secrets and variables > Actions
+   - Add a new repository secret named `FIREBASE_SERVICE_ACCOUNT_URL_SAVER_APP_123`
+   - Paste the entire content of the service account JSON file
+
+3. Push changes to the main branch to trigger deployment
+   ```bash
+   git push origin main
+   ```
+
+## iOS Shortcut Setup
+
+1. Create a new iOS Shortcut on your iPhone
+2. Add a "Get Current URL" action
+3. Add a "Get Contents of URL" action with:
+   - Method: POST
+   - URL: your-firebase-function-url
+   - Headers: Content-Type: application/json
+   - Request Body: JSON with the URL, title, and current date
 
 ## License
 
-This project is licensed under the MIT License. 
+MIT 
