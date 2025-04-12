@@ -88,7 +88,7 @@ When browsing on their iPhone, the user will activate a pre-configured iOS Short
 *   **Integration & Deployment:**
 
     *   iOS Shortcuts for allowing users to share URLs from their iPhones.
-    *   Vercel for hosting and deploying the web application.
+    *   firebase for hosting and deploying the web application.
     *   Cursor as the advanced IDE for AI-powered real-time coding suggestions during development.
 
 ## 6. Non-Functional Requirements
@@ -114,7 +114,7 @@ When browsing on their iPhone, the user will activate a pre-configured iOS Short
 *   Assumes availability of the Grok summarization service with expected API performance.
 *   The system does not implement a retry mechanism for AI summarization failures; failed summaries will simply be marked as unavailable.
 *   The project will use Supabase for both authentication and database, aligning with the developer’s previous experiences and preferences.
-*   Deployment is preferred on Vercel for ease of credential management and integrated hosting.
+*   Deployment is preferred on firebase for ease of credential management and integrated hosting.
 
 ## 8. Known Issues & Potential Pitfalls
 

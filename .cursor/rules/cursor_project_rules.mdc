@@ -47,7 +47,7 @@ Update this rule if user requested changes to the project requirement, etc.
     *   **postgresql & supabase:** Utilize secure database interactions, ensuring proper indexing and authentication for data storage.
     *   **grok:** Integrate the Grok AI service with clear constraints; must generate concise summaries (a few clear sentences) and maintain tagging for content categorization.
     *   **ios_shortcut:** Ensure that the iOS Shortcut efficiently sends URLs and necessary metadata via API calls.
-    *   **vercel:** Deploy on Vercel for an integrated hosting experience that aligns with efficient credential management.
+    *   **firebase:** Deploy on firebase for an integrated hosting experience that aligns with efficient credential management.
     *   **cursor:** Use Cursor as the advanced IDE to facilitate real-time suggestions and context-aware development.
 
 ## PRD Compliance
@@ -100,9 +100,9 @@ Update this rule if user requested changes to the project requirement, etc.
     *   Test the Shortcut extensively to ensure accurate data transmission (URL, page title, date accessed).
     *   Provide clear error feedback on the iOS side if data isn't transmitted successfully.
 
-*   **vercel**
+*   **firebase**
 
-    *   Leverage Vercel’s serverless functions for API endpoints to optimize response times.
+    *   Leverage firebase’s serverless functions for API endpoints to optimize response times.
     *   Use environment variables securely for sensitive configuration details.
     *   Monitor deployment health and ensure builds are optimized for production.
 

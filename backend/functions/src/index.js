@@ -210,20 +210,6 @@ async function summarizeUrl(url) {
       return getMockSummary(url);
     }
 
-    // First, fetch the content of the URL
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch URL content: ${response.status}`);
-    }
-
-    const htmlContent = await response.text();
-
-    // Extract text content from HTML to make it easier to process
-    const textContent = extractTextFromHtml(htmlContent);
-
-    // Trim content to a reasonable size
-    const trimmedContent = textContent.slice(0, 8000);
-
     // Call the Grok AI API for summarization using the OpenAI-compatible interface
     const grokResponse = await fetch("https://api.x.ai/v1/chat/completions", {
       method: "POST",
@@ -240,7 +226,7 @@ async function summarizeUrl(url) {
           },
           {
             role: "user",
-            content: `Given the following web page content:
+            content: `Please visit and analyze this URL: ${url}
             
             1. Extract a concise, engaging title for this content (5-10 words).
             2. Summarize the content in a concise paragraph (3-4 sentences).
@@ -249,10 +235,7 @@ async function summarizeUrl(url) {
             Format your response as a JSON object with these fields:
             - 'title': The extracted title
             - 'summary': The content summary
-            - 'tags': Array of relevant tags
-            
-            Web content:
-            ${trimmedContent}`
+            - 'tags': Array of relevant tags`
           }
         ],
         temperature: 0.3,

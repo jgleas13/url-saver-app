@@ -25,7 +25,7 @@ The backend provides a set of well-designed API endpoints to facilitate communic
 
 ## Hosting Solutions
 
-The backend is hosted on Vercel, a cloud platform known for its excellent integration and ease of use. Vercel was chosen because it offers highly reliable deployment options that are both scalable and cost-effective. The platform simplifies the process of going live with the backend by handling infrastructure concerns like load balancing and automatic scaling. This ensures that as more users share URLs and access the web dashboard, the system remains responsive and stable.
+The backend is hosted on firebase, a cloud platform known for its excellent integration and ease of use. firebase was chosen because it offers highly reliable deployment options that are both scalable and cost-effective. The platform simplifies the process of going live with the backend by handling infrastructure concerns like load balancing and automatic scaling. This ensures that as more users share URLs and access the web dashboard, the system remains responsive and stable.
 
 ## Infrastructure Components
 
@@ -41,4 +41,4 @@ To ensure that the backend remains healthy and performs at its best, we use a co
 
 ## Conclusion and Overall Backend Summary
 
-In summary, the backend for this project is built to handle the seamless sharing and processing of URLs from an iPhone while maintaining high performance and security. It uses a Node.js server that interacts with a PostgreSQL database managed via Supabase, and it integrates with the Grok AI summarization service for processing webpage content. Deployed on Vercel and supported by essential infrastructure components like load balancers and CDNs, the backend offers a scalable and secure solution that fits perfectly with the project's goals. Overall, this setup not only meets the immediate needs of URL sharing and summarization but also lays the foundation for future enhancements and a smooth user experience.
+In summary, the backend for this project is built to handle the seamless sharing and processing of URLs from an iPhone while maintaining high performance and security. It uses a Node.js server that interacts with a PostgreSQL database managed via Supabase, and it integrates with the Grok AI summarization service for processing webpage content. Deployed on firebase and supported by essential infrastructure components like load balancers and CDNs, the backend offers a scalable and secure solution that fits perfectly with the project's goals. Overall, this setup not only meets the immediate needs of URL sharing and summarization but also lays the foundation for future enhancements and a smooth user experience.

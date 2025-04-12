@@ -53,18 +53,18 @@ Update this rule if user requested changes to the project requirement, etc.
 
 1.  In the `/frontend` directory, create a service file at `/frontend/services/api.js` that defines functions to perform API calls (GET and POST) to the backend endpoints (e.g., using `fetch` or `axios`) (**App Flow: Integration between frontend and backend**).
 2.  Integrate the POST URL function so that when the iOS Shortcut triggers (or when simulated in development), it sends the URL data to the backend endpoint (`/api/v1/urls`), and then update the dashboard view accordingly (**App Flow: iPhone URL Sharing via Shortcut**).
-3.  Ensure Supabase authentication is tied in so that only authenticated users can invoke these API calls; adjust CORS settings in the backend (`/backend/index.js`) to allow requests from your Vercel-hosted frontend (**PRD Section 3, Q&A: User Authentication**).
+3.  Ensure Supabase authentication is tied in so that only authenticated users can invoke these API calls; adjust CORS settings in the backend (`/backend/index.js`) to allow requests from your firebase-hosted frontend (**PRD Section 3, Q&A: User Authentication**).
 4.  **Validation**: Test the complete flow by simulating an iOS Shortcut call (using a tool like Postman) and verify that the dashboard updates with a new URL entry (including checking summary and tag data).
 
 **Phase 5: Deployment**
 
-1.  Prepare the project for deployment on Vercel by merging the frontend and backend where possible. For the Next.js app, place API routes under `/pages/api` if choosing a serverless deployment, or deploy the backend separately (ensure CORS settings allow integration) (**Tech Stack: Vercel, PRD Section 7**).
-2.  Configure environment variables on Vercel for Supabase (e.g. SUPABASE_URL, SUPABASE_KEY) and the Grok API credentials. Store these variables securely in the Vercel dashboard (**PRD Section 7, Tech Stack: Deployment**).
-3.  Deploy the Next.js frontend (with integrated or separate API endpoints) to Vercel ensuring the region is set as preferred (e.g. deployment region if specified in your Vercel account) (**PRD Section 7, Q&A: Deployment Preferences**).
-4.  If deploying the backend separately, deploy it to an environment that supports Node.js (e.g., using a Vercel serverless function or another Node provider), and update the frontend service endpoints accordingly (**Tech Stack: Deployment**).
+1.  Prepare the project for deployment on firebase by merging the frontend and backend where possible. For the Next.js app, place API routes under `/pages/api` if choosing a serverless deployment, or deploy the backend separately (ensure CORS settings allow integration) (**Tech Stack: firebase, PRD Section 7**).
+2.  Configure environment variables on firebase for Supabase (e.g. SUPABASE_URL, SUPABASE_KEY) and the Grok API credentials. Store these variables securely in the firebase dashboard (**PRD Section 7, Tech Stack: Deployment**).
+3.  Deploy the Next.js frontend (with integrated or separate API endpoints) to firebase ensuring the region is set as preferred (e.g. deployment region if specified in your firebase account) (**PRD Section 7, Q&A: Deployment Preferences**).
+4.  If deploying the backend separately, deploy it to an environment that supports Node.js (e.g., using a firebase serverless function or another Node provider), and update the frontend service endpoints accordingly (**Tech Stack: Deployment**).
 5.  Create and commit a detailed README that outlines the deployment process and any necessary configuration steps for production, including setting up Supabase and Grok API keys (**PRD Section 7**).
 6.  **Validation**: After deployment, perform an end-to-end test by signing in with Google, posting a URL via a simulated iOS Shortcut call, and then verifying on the production dashboard that the URL, its summary, and metadata appear correctly.
 
 **Note:** The iOS Shortcut workflow is external. You should create a simple shortcut that sends a POST request with the URL, page title, and current date to the deployed backend API. Test this using the Apple Shortcuts app, and ensure the workflow works as described in the App Flow (**App Flow: iOS URL Sharing via Shortcut**).
 
-This implementation plan provides a clear, step-by-step roadmap to build the URL-sharing and summarization tool using Next.js (version 14), Node.js, PostgreSQL via Supabase, Grok AI, and deployment on Vercel as specified in the provided project documents.
+This implementation plan provides a clear, step-by-step roadmap to build the URL-sharing and summarization tool using Next.js (version 14), Node.js, PostgreSQL via Supabase, Grok AI, and deployment on firebase as specified in the provided project documents.

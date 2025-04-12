@@ -8,8 +8,13 @@ interface LinkTableProps {
   onDelete: (urlId: string) => void;
 }
 
+type SortField = 'title' | 'date' | 'status';
+type SortDirection = 'asc' | 'desc';
+
 export default function LinkTable({ urls, onDelete }: LinkTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -43,28 +48,79 @@ export default function LinkTable({ urls, onDelete }: LinkTableProps) {
     }
   };
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field and default to descending
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+
+  const getSortedUrls = () => {
+    return [...urls].sort((a, b) => {
+      const multiplier = sortDirection === 'asc' ? 1 : -1;
+      
+      switch (sortField) {
+        case 'title':
+          const titleA = (a.aiGeneratedTitle || a.pageTitle).toLowerCase();
+          const titleB = (b.aiGeneratedTitle || b.pageTitle).toLowerCase();
+          return titleA.localeCompare(titleB) * multiplier;
+        case 'date':
+          return (new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) * multiplier;
+        case 'status':
+          return a.processingStatus.localeCompare(b.processingStatus) * multiplier;
+        default:
+          return 0;
+      }
+    });
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return '↕️';
+    }
+    return sortDirection === 'asc' ? '↑' : '↓';
+  };
+
+  const sortedUrls = getSortedUrls();
+
   return (
     <div className="bg-white shadow overflow-hidden rounded-lg">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Title
+            <th 
+              scope="col" 
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              onClick={() => handleSort('title')}
+            >
+              Title {getSortIcon('title')}
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Date Added
+            <th 
+              scope="col" 
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              onClick={() => handleSort('date')}
+            >
+              Date Added {getSortIcon('date')}
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Tags
             </th>
-            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
+            <th 
+              scope="col" 
+              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+              onClick={() => handleSort('status')}
+            >
+              Status {getSortIcon('status')}
             </th>
             <th scope="col" className="w-10"></th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {urls.map((url) => (
+          {sortedUrls.map((url) => (
             <React.Fragment key={url.id}>
               <tr 
                 className="hover:bg-gray-50 cursor-pointer"
@@ -84,7 +140,7 @@ export default function LinkTable({ urls, onDelete }: LinkTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-500">
-                    {formatDate(url.dateAccessed)}
+                    {formatDate(url.created_at)}
                   </div>
                 </td>
                 <td className="px-6 py-4">

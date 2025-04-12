@@ -1,5 +1,5 @@
 import { auth, db } from '@/config/firebaseClient';
-import { collection, query, getDocs, addDoc, orderBy, serverTimestamp, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, getDocs, addDoc, orderBy, serverTimestamp, doc, deleteDoc, updateDoc, getDoc } from 'firebase/firestore';
 
 // Types
 export interface UrlData {
@@ -95,7 +95,8 @@ export const saveUrl = async (urlData: {
 
     const docRef = await addDoc(collection(db, 'users', userId, 'urls'), newUrl);
     
-    // Return the saved URL data with the new ID
+    // Return the saved URL data with the new ID and proper timestamps
+    const now = new Date().toISOString();
     return {
       id: docRef.id,
       url: newUrl.url,
@@ -104,8 +105,8 @@ export const saveUrl = async (urlData: {
       summary: newUrl.summary,
       tags: newUrl.tags,
       processingStatus: 'pending' as const,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      created_at: now,
+      updated_at: now
     };
   } catch (error) {
     console.error('Error saving URL:', error);
@@ -138,6 +139,58 @@ export const deleteUrl = async (urlId: string): Promise<void> => {
     console.log('URL successfully deleted');
   } catch (error) {
     console.error('Error deleting URL:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update a URL in Firestore
+ * @param urlId The ID of the URL to update
+ * @param updateData The data to update
+ * @returns Promise<UrlData>
+ */
+export const updateUrl = async (
+  urlId: string,
+  updateData: Partial<Omit<UrlData, 'id' | 'created_at' | 'updated_at'>>
+): Promise<UrlData> => {
+  try {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    const userId = currentUser.uid;
+    const urlDocRef = doc(db, 'users', userId, 'urls', urlId);
+
+    // Add server timestamp for updated_at
+    const updatePayload = {
+      ...updateData,
+      updated_at: serverTimestamp()
+    };
+
+    await updateDoc(urlDocRef, updatePayload);
+
+    // Get the updated document
+    const updatedDoc = await getDoc(urlDocRef);
+    if (!updatedDoc.exists()) {
+      throw new Error('URL not found');
+    }
+
+    const data = updatedDoc.data();
+    return {
+      id: urlId,
+      url: data.url,
+      pageTitle: data.pageTitle || 'Untitled',
+      aiGeneratedTitle: data.aiGeneratedTitle,
+      dateAccessed: data.dateAccessed || new Date().toISOString(),
+      summary: data.summary || null,
+      tags: data.tags || ['untagged'],
+      processingStatus: data.processingStatus || 'completed',
+      created_at: data.created_at.toDate().toISOString(),
+      updated_at: data.updated_at.toDate().toISOString()
+    };
+  } catch (error) {
+    console.error('Error updating URL:', error);
     throw error;
   }
 }; 
